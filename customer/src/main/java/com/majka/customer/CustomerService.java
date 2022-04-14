@@ -2,6 +2,8 @@ package com.majka.customer;
 
 import com.majka.clients.fraud.FraudCheckResponse;
 import com.majka.clients.fraud.FraudClient;
+import com.majka.clients.notification.NotificationClient;
+import com.majka.clients.notification.NotificationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +15,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final RestTemplate restTemplate;
     private final FraudClient fraudClient;
+    private final NotificationClient notificationClient;
 
     public void registerCustomer(CustomerRegistrationRequest request) {
         Customer customer = Customer.builder()
@@ -41,6 +44,12 @@ public class CustomerService {
 //        customerRepository.save(customer);
 
         //send notification
+        notificationClient.sendNotification(new NotificationRequest(
+                customer.getId(),
+                customer.getEmail(),
+                String.format("Hi %s, welcome to your account...",
+                        customer.getFirstName()))
+        );
     }
 
 }
