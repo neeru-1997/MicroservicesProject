@@ -2,6 +2,7 @@ package com.majka.amqp;
 
 import lombok.AllArgsConstructor;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -15,11 +16,21 @@ public class RabbitMQConfig {
 
     private final ConnectionFactory connectionFactory;
 
+    // allows us to push messages to the queue
     @Bean
     public AmqpTemplate amqpTemplate(){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jacksonConverter());
         return rabbitTemplate;
+    }
+
+    // allows us to listen messages from the queue
+    @Bean
+    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(){
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(jacksonConverter());
+        return factory;
     }
 
     @Bean
